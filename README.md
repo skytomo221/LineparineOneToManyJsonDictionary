@@ -1,6 +1,6 @@
 # LineparineOneToManyJsonDictionary
 
-![https://github.com/skytomo221/LineparineOneToManyJsonDictionary/blob/master/images/thumbnail.png?raw=true]()
+![](https://raw.githubusercontent.com/skytomo221/LineparineOneToManyJsonDictionary/master/images/thumbnail.png)
 
 LineparineOneToManyJsonDictionaryは、lineparine.dicをOTM-JSON形式に変換するプログラムです。
 
