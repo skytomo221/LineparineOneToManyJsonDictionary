@@ -22,6 +22,7 @@ namespace LineparineOneToManyJsonDictionary
             var path = @"lineparine.csv";
             var dicwords = Load(path);
             var dictionary = new OneToManyJson();
+            /*
             foreach (var dicword in dicwords)
             {
                 var translations = new List<Translation>();
@@ -147,6 +148,12 @@ namespace LineparineOneToManyJsonDictionary
                     if ("gir" + word.Entry.Form != Buffer("gir", word.Entry.Form))
                         word.Variations.Add(new Variation { Title = "定性", Form = "gir" + word.Entry.Form });
                 }
+                dictionary.AddWord(word);
+            }
+            */
+            foreach (var dicword in dicwords)
+            {
+                var word = (new WordConverter { DicWord = dicword }).Convert();
                 dictionary.AddWord(word);
             }
             var options = new System.Text.Json.JsonSerializerOptions
