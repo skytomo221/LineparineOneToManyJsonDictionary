@@ -29,14 +29,16 @@ namespace LineparineOneToManyJsonDictionary
         protected WordConverter ConvertTranslations()
         {
             Word.Translations = new List<Translation>();
-            foreach (var line in DicWord.Trans.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
-                var line2 = line.Replace("【前置詞】(文語・詩語：【後置詞】)", "【口語前置詞・文語後置詞】")
+                var line2 =
+                    line.Replace("【前置詞】(文語・詩語：【後置詞】)", "【口語前置詞・文語後置詞】")
                     .Replace("【後置詞】(口語:【前置詞】)", "【口語前置詞・文語後置詞】");
                 var r = new Regex(@"【(.*)】(.*)($|\n)");
                 MatchCollection mc = r.Matches(line2);
                 if (mc.Count == 0)
                 {
+                    DicWord.Trans = DicWord.Trans.Split('\n').Skip(index).Aggregate((now, next) => now + "\n" + next);
                     break;
                 }
                 foreach (Match m in mc)
@@ -47,7 +49,6 @@ namespace LineparineOneToManyJsonDictionary
                         Forms = Regex.Split(m.Groups[2].Value, @"\s").ToList(),
                     });
                 }
-                DicWord.Trans = DicWord.Trans.Substring(line.Length + ((DicWord.Trans.Length <= line.Length) ? 0 : 1));
             }
             return this;
         }
@@ -67,6 +68,17 @@ namespace LineparineOneToManyJsonDictionary
             }
             return this;
         }
+
+        protected WordConverter ConvertWording()
+        {
+            var wording = new Content();
+            foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
+            {
+
+            }
+            return this;
+        }
+
 
         protected WordConverter ConvertRemarks()
         {
