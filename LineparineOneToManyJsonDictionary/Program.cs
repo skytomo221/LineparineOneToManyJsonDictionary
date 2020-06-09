@@ -153,9 +153,10 @@ namespace LineparineOneToManyJsonDictionary
             */
             foreach (var dicword in dicwords)
             {
-                var word = (new WordConverter { DicWord = dicword }).Convert();
+                var word = (new WordConverter { DicWord = dicword, DicWords = dicwords }).Convert();
                 dictionary.AddWord(word);
             }
+            dictionary.RelationIdCompletion();
             var options = new System.Text.Json.JsonSerializerOptions
             {
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),

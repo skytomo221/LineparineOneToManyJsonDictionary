@@ -14,6 +14,8 @@ namespace LineparineOneToManyJsonDictionary
 
         public DicWord DicWord { get; set; }
 
+        public List<DicWord> DicWords { get; set; }
+
         protected WordConverter ConvertEntry()
         {
             Word = new Word
@@ -122,13 +124,90 @@ namespace LineparineOneToManyJsonDictionary
             return this;
         }
 
-        protected WordConverter ConvertRemarks()
+        protected WordConverter ConvertCulture()
         {
+            var culture = new Content { Title = "文化", Text = string.Empty };
+            var delete = new List<int>();
+            var wordingFlag = false;
+            foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
+            {
+                if (line == "[文化]")
+                    wordingFlag = true;
+                else if (wordingFlag)
+                    culture.Text = (culture.Text + "\n" + line).Trim();
+                else if (string.IsNullOrEmpty(line))
+                    wordingFlag = false;
+                if (wordingFlag)
+                    delete.Add(index);
+            }
+            DicWord.Trans =
+                (DicWord.Trans.Split('\n').Length == delete.Count) ?
+                string.Empty :
+                DicWord.Trans.Split('\n')
+                .Select((line, index) => (line, index))
+                .TakeWhile((line, index) => !delete.Contains(index))
+                .Select(taple => taple.line)
+                .Aggregate((now, next) => now + "\n" + next);
+            if (!string.IsNullOrEmpty(culture.Text))
+                Word.Contents.Add(culture);
+            culture = new Content { Title = "文化", Text = string.Empty };
+            delete.Clear();
+            wordingFlag = false;
+            foreach (var (line, index) in DicWord.Exp.Split('\n').Select((line, index) => (line, index)))
+            {
+                if (line == "[文化]")
+                    wordingFlag = true;
+                else if (wordingFlag)
+                    culture.Text = (culture.Text + "\n" + line).Trim();
+                else if (string.IsNullOrEmpty(line))
+                    wordingFlag = false;
+                if (wordingFlag)
+                    delete.Add(index);
+            }
+            DicWord.Exp =
+                (DicWord.Exp.Split('\n').Length == delete.Count) ?
+                string.Empty :
+                DicWord.Exp.Split('\n')
+                .Select((line, index) => (line, index))
+                .TakeWhile((line, index) => !delete.Contains(index))
+                .Select(taple => taple.line)
+                .Aggregate((now, next) => now + "\n" + next);
+            if (!string.IsNullOrEmpty(culture.Text))
+                Word.Contents.Add(culture);
+            return this;
+        }
+
+        protected WordConverter ConvertRemarks()
+        {            
             Word.Contents.Add(new Content
             {
                 Title = "備考",
-                Text = DicWord.Trans + "\n" + DicWord.Exp,
+                Text = (DicWord.Trans + "\n" + DicWord.Exp).Trim(),
             });
+            return this;
+        }
+
+        public WordConverter ConvertRelations()
+        {
+            var relations = new List<Relation>();
+            var remarks = Word.Contents.Find(c => c.Title == "備考").Text;
+            if (Regex.IsMatch(remarks, @"^→[A-Za-z']+"))
+            {
+                var r = new Regex(@"→([A-Za-z']+)");
+                MatchCollection mc = r.Matches(remarks);
+                foreach (Match m in mc)
+                {
+                    if (DicWords.Any(w => w.Word == m.Groups[1].Value))
+                    {
+                        Word.Relations.Add(new Relation
+                        {
+                            Title = "転送",
+                            Entry = new Entry { Form = m.Groups[1].Value },
+                        });
+                        Word.Contents.Remove(Word.Contents.Find(c => c.Title == "備考"));
+                    }
+                }
+            }
             return this;
         }
 
@@ -146,7 +225,9 @@ namespace LineparineOneToManyJsonDictionary
                 .ConvertTranslations()
                 .ConvertTags()
                 .ConvertWording()
+                .ConvertCulture()
                 .ConvertRemarks()
+                .ConvertRelations()
                 .Word;
         }
     }
