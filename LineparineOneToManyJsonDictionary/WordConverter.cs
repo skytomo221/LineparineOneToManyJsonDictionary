@@ -71,21 +71,63 @@ namespace LineparineOneToManyJsonDictionary
 
         protected WordConverter ConvertWording()
         {
-            var wording = new Content();
+            var wording = new Content { Title = "語法", Text = string.Empty };
+            var delete = new List<int>();
+            var wordingFlag = false;
             foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
-
+                if (line == "[語法]")
+                    wordingFlag = true;
+                else if (wordingFlag)
+                    wording.Text = (wording.Text + "\n" + line).Trim();
+                else if (string.IsNullOrEmpty(line))
+                    wordingFlag = false;
+                if (wordingFlag)
+                    delete.Add(index);
             }
+            DicWord.Trans =
+                (DicWord.Trans.Split('\n').Length == delete.Count) ?
+                string.Empty :
+                DicWord.Trans.Split('\n')
+                .Select((line, index) => (line, index))
+                .TakeWhile((line, index) => !delete.Contains(index))
+                .Select(taple => taple.line)
+                .Aggregate((now, next) => now + "\n" + next);
+            if (!string.IsNullOrEmpty(wording.Text))
+                Word.Contents.Add(wording);
+            wording = new Content { Title = "語法", Text = string.Empty };
+            delete.Clear();
+            wordingFlag = false;
+            foreach (var (line, index) in DicWord.Exp.Split('\n').Select((line, index) => (line, index)))
+            {
+                if (line == "[語法]")
+                    wordingFlag = true;
+                else if (wordingFlag)
+                    wording.Text = (wording.Text + "\n" + line).Trim();
+                else if (string.IsNullOrEmpty(line))
+                    wordingFlag = false;
+                if (wordingFlag)
+                    delete.Add(index);
+            }
+            DicWord.Exp =
+                (DicWord.Exp.Split('\n').Length == delete.Count) ?
+                string.Empty :
+                DicWord.Exp.Split('\n')
+                .Select((line, index) => (line, index))
+                .TakeWhile((line, index) => !delete.Contains(index))
+                .Select(taple => taple.line)
+                .Aggregate((now, next) => now + "\n" + next);
+            if (!string.IsNullOrEmpty(wording.Text))
+                Word.Contents.Add(wording);
             return this;
         }
-
 
         protected WordConverter ConvertRemarks()
         {
             Word.Contents.Add(new Content
             {
                 Title = "備考",
-                Text = DicWord.Trans,
+                Text = DicWord.Trans + "\n" + DicWord.Exp,
             });
             return this;
         }
@@ -93,6 +135,7 @@ namespace LineparineOneToManyJsonDictionary
         public WordConverter ConvertInit()
         {
             DicWord.Trans = DicWord.Trans.Replace("\r\n", "\n");
+            DicWord.Exp = DicWord.Exp.Replace("\r\n", "\n");
             return this;
         }
 
@@ -102,6 +145,7 @@ namespace LineparineOneToManyJsonDictionary
                 .ConvertEntry()
                 .ConvertTranslations()
                 .ConvertTags()
+                .ConvertWording()
                 .ConvertRemarks()
                 .Word;
         }
