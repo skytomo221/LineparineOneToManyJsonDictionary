@@ -33,24 +33,15 @@ namespace LineparineOneToManyJsonDictionary
             Word.Translations = new List<Translation>();
             var delete = new List<int>();
             var flag = false;
+            DicWord.Trans = DicWord.Trans
+                .Replace("【前置詞】(文語・詩語：【後置詞】)", "【口語前置詞・文語後置詞】")
+                .Replace("【後置詞】(口語:【前置詞】)", "【口語前置詞・文語後置詞】");
             foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
-                var line2 =
-                    line.Replace("【前置詞】(文語・詩語：【後置詞】)", "【口語前置詞・文語後置詞】")
-                    .Replace("【後置詞】(口語:【前置詞】)", "【口語前置詞・文語後置詞】");
                 var r = new Regex(@"【(.*)】(.*)($|\n)");
-                MatchCollection mc = r.Matches(line2);
+                MatchCollection mc = r.Matches(line);
                 if (mc.Count == 0)
                 {
-                    delete.Add(index);
-                    DicWord.Trans =
-                        (DicWord.Trans.Split('\n').Length == delete.Count) ?
-                        string.Empty :
-                        DicWord.Trans.Split('\n')
-                        .Select((line3, index2) => (line3, index2))
-                        .TakeWhile((line3, index2) => !delete.Contains(index2))
-                        .Select(taple => taple.line3)
-                        .Aggregate((now, next) => now + "\n" + next);
                     break;
                 }
                 else
@@ -66,6 +57,14 @@ namespace LineparineOneToManyJsonDictionary
                     delete.Add(index);
                 }
             }
+            DicWord.Trans =
+                (DicWord.Trans.Split('\n').Length == delete.Count) ?
+                string.Empty :
+                DicWord.Trans.Split('\n')
+                .Select((line, index) => (line, index))
+                .Where((line, index) => !delete.Contains(index))
+                .Select(taple => taple.line)
+                .Aggregate((now, next) => now + "\n" + next);
             return this;
         }
 
