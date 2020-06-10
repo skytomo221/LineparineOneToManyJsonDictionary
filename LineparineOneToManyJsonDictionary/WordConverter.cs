@@ -31,6 +31,8 @@ namespace LineparineOneToManyJsonDictionary
         protected WordConverter ConvertTranslations()
         {
             Word.Translations = new List<Translation>();
+            var delete = new List<int>();
+            var flag = false;
             foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
                 var line2 =
@@ -40,16 +42,28 @@ namespace LineparineOneToManyJsonDictionary
                 MatchCollection mc = r.Matches(line2);
                 if (mc.Count == 0)
                 {
-                    DicWord.Trans = DicWord.Trans.Split('\n').Skip(index).Aggregate((now, next) => now + "\n" + next);
+                    delete.Add(index);
+                    DicWord.Trans =
+                        (DicWord.Trans.Split('\n').Length == delete.Count) ?
+                        string.Empty :
+                        DicWord.Trans.Split('\n')
+                        .Select((line3, index2) => (line3, index2))
+                        .TakeWhile((line3, index2) => !delete.Contains(index2))
+                        .Select(taple => taple.line3)
+                        .Aggregate((now, next) => now + "\n" + next);
                     break;
                 }
-                foreach (Match m in mc)
+                else
                 {
-                    Word.Translations.Add(new Translation
+                    foreach (Match m in mc)
                     {
-                        Title = m.Groups[1].Value.Replace("】【", "・"),
-                        Forms = Regex.Split(m.Groups[2].Value, @"\s").ToList(),
-                    });
+                        Word.Translations.Add(new Translation
+                        {
+                            Title = m.Groups[1].Value.Replace("】【", "・"),
+                            Forms = Regex.Split(m.Groups[2].Value, @"\s").ToList(),
+                        });
+                    }
+                    delete.Add(index);
                 }
             }
             return this;
@@ -75,16 +89,16 @@ namespace LineparineOneToManyJsonDictionary
         {
             var wording = new Content { Title = "語法", Text = string.Empty };
             var delete = new List<int>();
-            var wordingFlag = false;
+            var flag = false;
             foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
                 if (line == "[語法]")
-                    wordingFlag = true;
-                else if (wordingFlag)
+                    flag = true;
+                else if (flag)
                     wording.Text = (wording.Text + "\n" + line).Trim();
                 else if (string.IsNullOrEmpty(line))
-                    wordingFlag = false;
-                if (wordingFlag)
+                    flag = false;
+                if (flag)
                     delete.Add(index);
             }
             DicWord.Trans =
@@ -99,16 +113,16 @@ namespace LineparineOneToManyJsonDictionary
                 Word.Contents.Add(wording);
             wording = new Content { Title = "語法", Text = string.Empty };
             delete.Clear();
-            wordingFlag = false;
+            flag = false;
             foreach (var (line, index) in DicWord.Exp.Split('\n').Select((line, index) => (line, index)))
             {
                 if (line == "[語法]")
-                    wordingFlag = true;
-                else if (wordingFlag)
+                    flag = true;
+                else if (flag)
                     wording.Text = (wording.Text + "\n" + line).Trim();
                 else if (string.IsNullOrEmpty(line))
-                    wordingFlag = false;
-                if (wordingFlag)
+                    flag = false;
+                if (flag)
                     delete.Add(index);
             }
             DicWord.Exp =
@@ -128,16 +142,16 @@ namespace LineparineOneToManyJsonDictionary
         {
             var culture = new Content { Title = "文化", Text = string.Empty };
             var delete = new List<int>();
-            var wordingFlag = false;
+            var flag = false;
             foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
                 if (line == "[文化]")
-                    wordingFlag = true;
-                else if (wordingFlag)
+                    flag = true;
+                else if (flag)
                     culture.Text = (culture.Text + "\n" + line).Trim();
                 else if (string.IsNullOrEmpty(line))
-                    wordingFlag = false;
-                if (wordingFlag)
+                    flag = false;
+                if (flag)
                     delete.Add(index);
             }
             DicWord.Trans =
@@ -152,16 +166,16 @@ namespace LineparineOneToManyJsonDictionary
                 Word.Contents.Add(culture);
             culture = new Content { Title = "文化", Text = string.Empty };
             delete.Clear();
-            wordingFlag = false;
+            flag = false;
             foreach (var (line, index) in DicWord.Exp.Split('\n').Select((line, index) => (line, index)))
             {
                 if (line == "[文化]")
-                    wordingFlag = true;
-                else if (wordingFlag)
+                    flag = true;
+                else if (flag)
                     culture.Text = (culture.Text + "\n" + line).Trim();
                 else if (string.IsNullOrEmpty(line))
-                    wordingFlag = false;
-                if (wordingFlag)
+                    flag = false;
+                if (flag)
                     delete.Add(index);
             }
             DicWord.Exp =
@@ -178,7 +192,7 @@ namespace LineparineOneToManyJsonDictionary
         }
 
         protected WordConverter ConvertRemarks()
-        {            
+        {
             Word.Contents.Add(new Content
             {
                 Title = "備考",
