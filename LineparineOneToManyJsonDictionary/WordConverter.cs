@@ -32,7 +32,6 @@ namespace LineparineOneToManyJsonDictionary
         {
             Word.Translations = new List<Translation>();
             var delete = new List<int>();
-            var flag = false;
             DicWord.Trans = DicWord.Trans
                 .Replace("【前置詞】(文語・詩語：【後置詞】)", "【口語前置詞・文語後置詞】")
                 .Replace("【後置詞】(口語:【前置詞】)", "【口語前置詞・文語後置詞】");
@@ -108,8 +107,7 @@ namespace LineparineOneToManyJsonDictionary
                 .TakeWhile((line, index) => !delete.Contains(index))
                 .Select(taple => taple.line)
                 .Aggregate((now, next) => now + "\n" + next);
-            if (!string.IsNullOrEmpty(wording.Text))
-                Word.Contents.Add(wording);
+            Word.Contents.Add(wording);
             wording = new Content { Title = "語法", Text = string.Empty };
             delete.Clear();
             flag = false;
@@ -132,8 +130,7 @@ namespace LineparineOneToManyJsonDictionary
                 .TakeWhile((line, index) => !delete.Contains(index))
                 .Select(taple => taple.line)
                 .Aggregate((now, next) => now + "\n" + next);
-            if (!string.IsNullOrEmpty(wording.Text))
-                Word.Contents.Add(wording);
+            Word.Contents.Add(wording);
             return this;
         }
 
@@ -161,8 +158,7 @@ namespace LineparineOneToManyJsonDictionary
                 .TakeWhile((line, index) => !delete.Contains(index))
                 .Select(taple => taple.line)
                 .Aggregate((now, next) => now + "\n" + next);
-            if (!string.IsNullOrEmpty(culture.Text))
-                Word.Contents.Add(culture);
+            Word.Contents.Add(culture);
             culture = new Content { Title = "文化", Text = string.Empty };
             delete.Clear();
             flag = false;
@@ -185,8 +181,7 @@ namespace LineparineOneToManyJsonDictionary
                 .TakeWhile((line, index) => !delete.Contains(index))
                 .Select(taple => taple.line)
                 .Aggregate((now, next) => now + "\n" + next);
-            if (!string.IsNullOrEmpty(culture.Text))
-                Word.Contents.Add(culture);
+            Word.Contents.Add(culture);
             return this;
         }
 
@@ -194,8 +189,13 @@ namespace LineparineOneToManyJsonDictionary
         {
             Word.Contents.Add(new Content
             {
+                Title = "例文",
+                Text = DicWord.Exp.Trim(),
+            });
+            Word.Contents.Add(new Content
+            {
                 Title = "備考",
-                Text = (DicWord.Trans + "\n" + DicWord.Exp).Trim(),
+                Text = DicWord.Trans.Trim(),
             });
             return this;
         }
@@ -224,16 +224,33 @@ namespace LineparineOneToManyJsonDictionary
             return this;
         }
 
-        public WordConverter ConvertInit()
+        public WordConverter Initialization()
         {
             DicWord.Trans = DicWord.Trans.Replace("\r\n", "\n");
             DicWord.Exp = DicWord.Exp.Replace("\r\n", "\n");
             return this;
         }
 
+        public WordConverter FinalAdjustment()
+        {
+            var delete = new List<Content>();
+            foreach (var content in Word.Contents)
+            {
+                if (string.IsNullOrEmpty(content.Text))
+                {
+                    delete.Add(content);
+                }
+            }
+            foreach (var content in delete)
+            {
+                Word.Contents.Remove(content);
+            }
+            return this;
+        }
+
         public Word Convert()
         {
-            return ConvertInit()
+            return Initialization()
                 .ConvertEntry()
                 .ConvertTranslations()
                 .ConvertTags()
@@ -241,6 +258,7 @@ namespace LineparineOneToManyJsonDictionary
                 .ConvertCulture()
                 .ConvertRemarks()
                 .ConvertRelations()
+                .FinalAdjustment()
                 .Word;
         }
     }
