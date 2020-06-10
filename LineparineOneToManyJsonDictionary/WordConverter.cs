@@ -202,22 +202,68 @@ namespace LineparineOneToManyJsonDictionary
 
         public WordConverter ConvertRelations()
         {
-            var relations = new List<Relation>();
-            var remarks = Word.Contents.Find(c => c.Title == "備考").Text;
-            if (Regex.IsMatch(remarks, @"^→[A-Za-z']+"))
+            //{
+            //    var relations = new List<Relation>();
+            //    foreach (var translation in Word.Translations)
+            //    {
+            //        if (Regex.IsMatch(translation.Forms, @"cf\. [A-Za-z']+"))
+            //        {
+            //            var r = new Regex(@"cf\. ([A-Za-z']+)");
+            //            MatchCollection mc = r.Matches(translation.Text);
+            //            foreach (Match m in mc)
+            //            {
+            //                if (DicWords.Any(w => w.Word == m.Groups[1].Value))
+            //                {
+            //                    Word.Relations.Add(new Relation
+            //                    {
+            //                        Title = string.Empty,
+            //                        Entry = new Entry { Form = m.Groups[1].Value },
+            //                    });
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
             {
-                var r = new Regex(@"→([A-Za-z']+)");
-                MatchCollection mc = r.Matches(remarks);
-                foreach (Match m in mc)
+                var relations = new List<Relation>();
+                foreach (var content in Word.Contents)
                 {
-                    if (DicWords.Any(w => w.Word == m.Groups[1].Value))
+                    if (Regex.IsMatch(content.Text, @"cf\. [A-Za-z']+"))
                     {
-                        Word.Relations.Add(new Relation
+                        var r = new Regex(@"cf\. ([A-Za-z']+)");
+                        MatchCollection mc = r.Matches(content.Text);
+                        foreach (Match m in mc)
                         {
-                            Title = "転送",
-                            Entry = new Entry { Form = m.Groups[1].Value },
-                        });
-                        Word.Contents.Remove(Word.Contents.Find(c => c.Title == "備考"));
+                            if (DicWords.Any(w => w.Word == m.Groups[1].Value))
+                            {
+                                Word.Relations.Add(new Relation
+                                {
+                                    Title = string.Empty,
+                                    Entry = new Entry { Form = m.Groups[1].Value },
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            {
+                var relations = new List<Relation>();
+                var remarks = Word.Contents.Find(c => c.Title == "備考").Text;
+                if (Regex.IsMatch(remarks, @"^→[A-Za-z']+"))
+                {
+                    var r = new Regex(@"→([A-Za-z']+)");
+                    MatchCollection mc = r.Matches(remarks);
+                    foreach (Match m in mc)
+                    {
+                        if (DicWords.Any(w => w.Word == m.Groups[1].Value))
+                        {
+                            Word.Relations.Add(new Relation
+                            {
+                                Title = string.Empty,
+                                Entry = new Entry { Form = m.Groups[1].Value },
+                            });
+                            Word.Contents.Remove(Word.Contents.Find(c => c.Title == "備考"));
+                        }
                     }
                 }
             }

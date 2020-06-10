@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
@@ -28,6 +29,13 @@ namespace LineparineOneToManyJsonDictionary
                 dictionary.AddWord(word);
             }
             dictionary.RelationIdCompletion();
+            foreach (var item in 
+                from word in dictionary.Words
+                where word.Translations.Count == 0
+                select word.Entry.Form)
+            {
+                Console.WriteLine(item);
+            }
             var options = new System.Text.Json.JsonSerializerOptions
             {
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
