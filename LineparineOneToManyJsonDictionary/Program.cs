@@ -25,11 +25,18 @@ namespace LineparineOneToManyJsonDictionary
             var dictionary = new OneToManyJson();
             foreach (var dicword in dicwords)
             {
-                var word = (new WordConverter { DicWord = dicword, DicWords = dicwords }).Convert();
+                var wc = new WordConverter { DicWord = dicword, DicWords = dicwords };
+                var word = wc.Convert();
                 dictionary.AddWord(word);
+                var subheadings = wc.AddSubheading();
+                foreach (var subheading in subheadings)
+                {
+                    if (dictionary.Words.FindAll(w => w.Entry.Form == subheading.Relations[0].Entry.Form).Count == 1)
+                        dictionary.AddWord(subheading);
+                }
             }
             dictionary.RelationIdCompletion();
-            foreach (var item in 
+            foreach (var item in
                 from word in dictionary.Words
                 where word.Translations.Count == 0
                 select word.Entry.Form)

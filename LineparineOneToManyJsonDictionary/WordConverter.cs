@@ -307,5 +307,77 @@ namespace LineparineOneToManyJsonDictionary
                 .FinalAdjustment()
                 .Word;
         }
+
+        public List<Word> AddSubheading()
+        {
+            var list = new List<Word>();
+            foreach (var content in Word.Contents)
+            {
+                foreach (var (line, index) in content.Text.Split('\n').Select((line, index) => (line, index)))
+                {
+                    var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-]+)\s(.*)($|\n)");
+                    MatchCollection mc = r.Matches(line);
+                    if (mc.Count == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        foreach (Match m in mc)
+                        {
+                            if (m.Groups[2].Value.Trim() == Word.Entry.Form)
+                            {
+                                Word.Translations.Add(new Translation
+                                {
+                                    Title = m.Groups[1].Value.Replace("】【", "・"),
+                                    Forms = Regex.Split(m.Groups[3].Value, @"\s").ToList(),
+                                });
+                            }
+                            else
+                            {
+                                var subheading = new Word
+                                {
+                                    Entry = new Entry
+                                    {
+                                        Form = m.Groups[2].Value.Trim(),
+                                    },
+                                    Tags = new List<string>
+                                    {
+                                        "小見出し",
+                                    },
+                                    Relations = new List<Relation>
+                                    {
+                                        new Relation
+                                        {
+                                            Title = "見出し語",
+                                            Entry = new Entry
+                                            {
+                                                Form = Word.Entry.Form,
+                                            }
+                                        }
+                                    }
+                                };
+                                subheading.Translations = new List<Translation>();
+                                subheading.Translations.Add(new Translation
+                                {
+                                    Title = m.Groups[1].Value.Replace("】【", "・"),
+                                    Forms = Regex.Split(m.Groups[3].Value, @"\s").ToList(),
+                                });
+                                //Word.Relations.Add(new Relation
+                                //{
+                                //    Title = "小見出し",
+                                //    Entry = new Entry
+                                //    {
+                                //        Form = m.Groups[2].Value.Trim()
+                                //    }
+                                //});
+                                list.Add(subheading);
+                            }
+                        }
+                    }
+                }
+            }
+            return list;
+        }
     }
 }
