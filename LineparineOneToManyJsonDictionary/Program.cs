@@ -22,7 +22,22 @@ namespace LineparineOneToManyJsonDictionary
         {
             var path = @"lineparine.csv";
             var dicwords = Load(path);
-            var dictionary = new OneToManyJson();
+            var dictionary = new OneToManyJson
+            {
+                Zpdic = new Zpdic
+                {
+                    AlphabetOrder = "",
+                    WordOrderType = "UNICODE",
+                    Punctuations = new List<string> { ",", "、" },
+                    IgnoredTranslationRegex = @"\(.*\)|（.*）|\[.*\]",
+                    PlainInformationTitles = null,
+                    InformationTitleOrder = null,
+                    FormFontFamily = null,
+                    DefaultWord = new Word
+                    {
+                    },
+                }
+            };
             foreach (var dicword in dicwords)
             {
                 var wc = new WordConverter { DicWord = dicword, DicWords = dicwords };

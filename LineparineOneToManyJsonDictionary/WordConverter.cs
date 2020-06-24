@@ -50,7 +50,7 @@ namespace LineparineOneToManyJsonDictionary
                         Word.Translations.Add(new Translation
                         {
                             Title = m.Groups[1].Value.Replace("】【", "・"),
-                            Forms = Regex.Split(m.Groups[2].Value, @"\s").ToList(),
+                            Forms = Regex.Split(m.Groups[2].Value, @"、|\s").ToList(),
                         });
                     }
                     delete.Add(index);
@@ -330,7 +330,7 @@ namespace LineparineOneToManyJsonDictionary
                                 Word.Translations.Add(new Translation
                                 {
                                     Title = m.Groups[1].Value.Replace("】【", "・"),
-                                    Forms = Regex.Split(m.Groups[3].Value, @"\s").ToList(),
+                                    Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
                                 });
                             }
                             else
@@ -361,7 +361,7 @@ namespace LineparineOneToManyJsonDictionary
                                 subheading.Translations.Add(new Translation
                                 {
                                     Title = m.Groups[1].Value.Replace("】【", "・"),
-                                    Forms = Regex.Split(m.Groups[3].Value, @"\s").ToList(),
+                                    Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
                                 });
                                 //Word.Relations.Add(new Relation
                                 //{
