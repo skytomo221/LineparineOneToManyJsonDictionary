@@ -43,10 +43,10 @@ namespace LineparineOneToManyJsonDictionary
                 var wc = new WordConverter { DicWord = dicword, DicWords = dicwords };
                 var word = wc.Convert();
                 dictionary.AddWord(word);
-                var subheadings = wc.AddSubheading();
+                var subheadings = wc.AddSubheading(dictionary);
                 foreach (var subheading in subheadings)
                 {
-                    if (dictionary.Words.FindAll(w => w.Entry.Form == subheading.Relations[0].Entry.Form).Count == 1)
+                    if (dictionary.Words.All(w => w.Entry.Id != subheading.Entry.Id))
                         dictionary.AddWord(subheading);
                 }
             }

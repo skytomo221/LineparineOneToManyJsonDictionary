@@ -308,7 +308,7 @@ namespace LineparineOneToManyJsonDictionary
                 .Word;
         }
 
-        public List<Word> AddSubheading()
+        public List<Word> AddSubheading(OneToManyJson dictionary)
         {
             var list = new List<Word>();
             foreach (var content in Word.Contents)
@@ -325,7 +325,8 @@ namespace LineparineOneToManyJsonDictionary
                     {
                         foreach (Match m in mc)
                         {
-                            if (m.Groups[2].Value.Trim() == Word.Entry.Form)
+                            var subheadingWord = m.Groups[2].Value.Trim();
+                            if (subheadingWord == Word.Entry.Form)
                             {
                                 Word.Translations.Add(new Translation
                                 {
@@ -335,42 +336,37 @@ namespace LineparineOneToManyJsonDictionary
                             }
                             else
                             {
-                                var subheading = new Word
-                                {
-                                    Entry = new Entry
+                                var subheading = dictionary.Words.FirstOrDefault(word => word.Entry.Form == subheadingWord) ??
+                                    new Word
                                     {
-                                        Form = m.Groups[2].Value.Trim(),
-                                    },
-                                    Tags = new List<string>
-                                    {
-                                        "小見出し",
-                                    },
-                                    Relations = new List<Relation>
-                                    {
-                                        new Relation
+                                        Entry = new Entry
                                         {
-                                            Title = "見出し語",
-                                            Entry = new Entry
+                                            Form = subheadingWord,
+                                        },
+                                        Tags = new List<string>
+                                        {
+                                            "小見出し",
+                                        },
+                                        Relations = new List<Relation>
+                                        {
+                                            new Relation
                                             {
-                                                Form = Word.Entry.Form,
+                                                Title = "見出し語",
+                                                Entry = Word.Entry,
                                             }
                                         }
-                                    }
-                                };
+                                    };
                                 subheading.Translations = new List<Translation>();
                                 subheading.Translations.Add(new Translation
                                 {
                                     Title = m.Groups[1].Value.Replace("】【", "・"),
                                     Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
                                 });
-                                //Word.Relations.Add(new Relation
-                                //{
-                                //    Title = "小見出し",
-                                //    Entry = new Entry
-                                //    {
-                                //        Form = m.Groups[2].Value.Trim()
-                                //    }
-                                //});
+                                Word.Relations.Add(new Relation
+                                {
+                                    Title = "小見出し",
+                                    Entry = subheading.Entry,
+                                });
                                 list.Add(subheading);
                             }
                         }
