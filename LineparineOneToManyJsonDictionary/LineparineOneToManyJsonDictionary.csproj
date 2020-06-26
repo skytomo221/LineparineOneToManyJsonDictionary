@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaseGenerator.cs" />
     <Compile Include="DicWord.cs" />
     <Compile Include="DicWordMap.cs" />
     <Compile Include="Program.cs" />

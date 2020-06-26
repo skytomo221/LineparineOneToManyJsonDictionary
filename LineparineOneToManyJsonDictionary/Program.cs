@@ -50,6 +50,12 @@ namespace LineparineOneToManyJsonDictionary
                         dictionary.AddWord(subheading);
                 }
             }
+            var casegen = new CaseGenerator();
+            foreach (var word in dictionary.Words)
+            {
+                casegen.Word = word;
+                casegen.AddCase();
+            }
             dictionary.RelationIdCompletion();
             foreach (var item in
                 from word in dictionary.Words
