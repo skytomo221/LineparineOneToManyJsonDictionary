@@ -95,72 +95,184 @@ namespace LineparineOneToManyJsonDictionary
                 }
         }
 
-        CaseGenerator AddNominative()
+        CaseGenerator AddNominative(string word, string option)
         {
-            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(Word.Entry.Form)))
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
             {
-                Word.Variations.Add(new Variation { Title = "主格", Form = Word.Entry.Form + "'s", });
+                Word.Variations.Add(new Variation { Title = option + "主格", Form = word + "'s", });
             }
-            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(Word.Entry.Form)))
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
             {
-                Word.Variations.Add(new Variation { Title = "主格", Form = Word.Entry.Form + BufferSound(Word.Entry.Form) + "'s", });
+                Word.Variations.Add(new Variation { Title = option + "主格", Form = word + BufferSound(word) + "'s", });
             }
             return this;
         }
 
-        CaseGenerator AddAccusation()
+        CaseGenerator AddAccusation(string word, string option)
         {
-            Word.Variations.Add(new Variation { Title = "対格", Form = Word.Entry.Form + "'i", });
+            Word.Variations.Add(new Variation { Title = option + "対格", Form = word + "'i", });
             return this;
         }
 
-        CaseGenerator AddGenitive()
+        CaseGenerator AddGenitive(string word, string option)
         {
-            if ((new string[] { "i", "y", "u", "o", "e", "a", "f", "r", "n", "l", "l", "v", "ch", "rl", }).Contains(LastLetter(Word.Entry.Form)))
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "f", "r", "n", "l", "l", "v", "ch", "rl", }).Contains(LastLetter(word)))
             {
-                Word.Variations.Add(new Variation { Title = "属格", Form = Word.Entry.Form + "'d", });
+                Word.Variations.Add(new Variation { Title = option + "属格", Form = word + "'d", });
             }
-            if ((new string[] { "p", "f", "t", "c", "x", "k", "m", "n", "l", "j", "d", "s", "g", "ch", }).Contains(LastLetter(Word.Entry.Form)))
+            if ((new string[] { "p", "f", "t", "c", "x", "k", "m", "n", "l", "j", "d", "s", "g", "ch", }).Contains(LastLetter(word)))
             {
-                Word.Variations.Add(new Variation { Title = "属格", Form = Word.Entry.Form + BufferSound(Word.Entry.Form) + "'d", });
-            }
-            return this;
-        }
-
-        CaseGenerator AddDignity()
-        {
-            if ((new string[] { "i", "y", "u", "o", "e", "a", "p", "r", }).Contains(LastLetter(Word.Entry.Form)))
-            {
-                Word.Variations.Add(new Variation { Title = "与格", Form = Word.Entry.Form + "'c", });
-            }
-            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "d", "s", "g", "dz", }).Contains(LastLetter(Word.Entry.Form)))
-            {
-                Word.Variations.Add(new Variation { Title = "与格", Form = Word.Entry.Form + BufferSound(Word.Entry.Form) + "'c", });
+                Word.Variations.Add(new Variation { Title = option + "属格", Form = word + BufferSound(word) + "'d", });
             }
             return this;
         }
 
-        CaseGenerator AddLocative()
+        CaseGenerator AddDignity(string word, string option)
         {
-            if ((new string[] { "i", "y", "u", "o", "e", "a", "k", "r", "l", "j", "g", "ch", }).Contains(LastLetter(Word.Entry.Form)))
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "p", "r", }).Contains(LastLetter(word)))
             {
-                Word.Variations.Add(new Variation { Title = "方向格", Form = Word.Entry.Form + "'l", });
+                Word.Variations.Add(new Variation { Title = option + "与格", Form = word + "'c", });
             }
-            if ((new string[] { "p", "t", "c", "x", "k", "m", "n", "l", "j", "v", "d", "s", "ch", "th", "rl", }).Contains(LastLetter(Word.Entry.Form)))
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "d", "s", "g", "dz", }).Contains(LastLetter(word)))
             {
-                Word.Variations.Add(new Variation { Title = "方向格", Form = Word.Entry.Form + BufferSound(Word.Entry.Form) + "'l", });
+                Word.Variations.Add(new Variation { Title = option + "与格", Form = word + BufferSound(word) + "'c", });
             }
             return this;
         }
 
+        CaseGenerator AddLocative(string word, string option)
+        {
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "k", "r", "l", "j", "g", "ch", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "向格", Form = word + "'l", });
+            }
+            if ((new string[] { "p", "t", "c", "x", "k", "m", "n", "l", "j", "v", "d", "s", "ch", "th", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "向格", Form = word + BufferSound(word) + "'l", });
+            }
+            return this;
+        }
+
+        CaseGenerator AddVocative(string word, string option)
+        {
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "呼格", Form = word + "sti", });
+            }
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "呼格", Form = word + BufferSound(word) + "sti", });
+            }
+            return this;
+        }
+
+        CaseGenerator AddAbessive(string word, string option)
+        {
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "欠格", Form = word + "nerfe", });
+            }
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "欠格", Form = word + BufferSound(word) + "nerfe", });
+            }
+            return this;
+        }
+
+        CaseGenerator AddComitative(string word, string option)
+        {
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "共格", Form = word + "'tj", });
+            }
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "共格", Form = word + BufferSound(word) + "'tj", });
+            }
+            return this;
+        }
+
+        CaseGenerator AddTopical(string word, string option)
+        {
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "話題格", Form = word + "'sci", });
+            }
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
+            {
+                Word.Variations.Add(new Variation { Title = option + "話題格", Form = word + BufferSound(word) + "'sci", });
+            }
+            return this;
+        }
+
+        CaseGenerator AddSingularForm(string word, string option)
+        {
+            return AddNominative(word, option)
+                  .AddAccusation(word, option)
+                  .AddGenitive(word, option)
+                  .AddDignity(word, option)
+                  .AddLocative(word, option)
+                  .AddVocative(word, option)
+                  .AddAbessive(word, option)
+                  .AddComitative(word, option)
+                  .AddTopical(word, option);
+        }
+
+        CaseGenerator AddPluralForm(string word, string option)
+        {
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
+            {
+                var plural = word + "ss";
+                Word.Variations.Add(new Variation { Title = option + "複数形", Form = plural });
+                AddSingularForm(plural, option + "複数形");
+            }
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
+            {
+                var plural = word + BufferSound(word) + "ss";
+                Word.Variations.Add(new Variation { Title = option + "複数形", Form = plural });
+                AddSingularForm(plural, option + "複数形");
+            }
+            return this;
+        }
+
+        CaseGenerator AddFinite(string word, string option)
+        {
+            {
+                var finite = "gir" + word;
+                Word.Variations.Add(new Variation { Title = option + "定性", Form = finite });
+                AddSingularForm(finite, "定性");
+                AddPluralForm(finite, "定性");
+            }
+            if ((new string[] { "i", "y", "u", "o", "e", "a", "r", "j", "rl", }).Contains(LastLetter(word)))
+            {
+                var finite = word + "stan";
+                Word.Variations.Add(new Variation { Title = option + "定性", Form = finite });
+                AddSingularForm(finite, "定性");
+                var indefinite = word + "ste";
+                Word.Variations.Add(new Variation { Title = option + "不定性", Form = indefinite });
+                AddSingularForm(indefinite, "不定性");
+                AddPluralForm(finite, "定性");
+                AddPluralForm(indefinite, "不定性");
+            }
+            if ((new string[] { "p", "f", "t", "x", "k", "z", "m", "n", "l", "j", "v", "d", "s", "g", "dz", "ch", "rl", }).Contains(LastLetter(word)))
+            {
+                var finite = word + BufferSound(word) + "stan";
+                Word.Variations.Add(new Variation { Title = option + "定性", Form = finite });
+                AddSingularForm(finite, "定性");
+                var indefinite = word + BufferSound(word) + "ste";
+                Word.Variations.Add(new Variation { Title = option + "不定性", Form = indefinite });
+                AddSingularForm(indefinite, "不定性");
+                AddPluralForm(finite, "定性");
+                AddPluralForm(indefinite, "不定性");
+            }
+            return this;
+        }
         public Word AddCase()
         {
             if (Word.Translations.Any(t => t.Title == "名詞") && !string.IsNullOrEmpty(LastVowelLetter(Word.Entry.Form)))
-                return AddNominative()
-                      .AddAccusation()
-                      .AddGenitive()
-                      .AddDignity()
-                      .AddLocative()
+                return AddSingularForm(Word.Entry.Form, "単数形")
+                      .AddPluralForm(Word.Entry.Form, string.Empty)
+                      .AddFinite(Word.Entry.Form, string.Empty)
                       .Word;
             else
                 return Word;
