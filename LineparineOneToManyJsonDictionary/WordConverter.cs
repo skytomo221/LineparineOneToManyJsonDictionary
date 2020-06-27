@@ -315,7 +315,7 @@ namespace LineparineOneToManyJsonDictionary
             {
                 foreach (var (line, index) in content.Text.Split('\n').Select((line, index) => (line, index)))
                 {
-                    var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-]+)\s(.*)($|\n)");
+                    var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-\s]+)\s(.*)($|\n)");
                     MatchCollection mc = r.Matches(line);
                     if (mc.Count == 0)
                     {
@@ -343,24 +343,22 @@ namespace LineparineOneToManyJsonDictionary
                                         {
                                             Form = subheadingWord,
                                         },
+                                        Translations = new List<Translation>(),
                                         Tags = new List<string>
                                         {
                                             "小見出し",
                                         },
-                                        Relations = new List<Relation>
-                                        {
-                                            new Relation
-                                            {
-                                                Title = "見出し語",
-                                                Entry = Word.Entry,
-                                            }
-                                        }
+                                        Relations = new List<Relation>(),
                                     };
-                                subheading.Translations = new List<Translation>();
                                 subheading.Translations.Add(new Translation
                                 {
                                     Title = m.Groups[1].Value.Replace("】【", "・"),
                                     Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
+                                });
+                                subheading.Relations.Add(new Relation
+                                {
+                                    Title = "見出し語",
+                                    Entry = Word.Entry,
                                 });
                                 Word.Relations.Add(new Relation
                                 {
