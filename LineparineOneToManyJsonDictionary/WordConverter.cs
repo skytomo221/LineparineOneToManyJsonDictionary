@@ -251,6 +251,7 @@ namespace LineparineOneToManyJsonDictionary
                 .ConvertTags()
                 .ConvertContent("語法")
                 .ConvertContent("文化")
+                .ConvertContent("文法")
                 .ConvertRemarks()
                 .ConvertRelations()
                 .FinalAdjustment()
