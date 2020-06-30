@@ -1,4 +1,4 @@
-using Otamajakushi;
+﻿using Otamajakushi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,60 +263,57 @@ namespace LineparineOneToManyJsonDictionary
             var list = new List<Word>();
             foreach (var content in Word.Contents)
             {
-                foreach (var (line, index) in content.Text.Split('\n').Select((line, index) => (line, index)))
+                var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-\s]+)\s(.*)($|\n)");
+                MatchCollection mc = r.Matches(content.Text);
+                if (mc.Count == 0)
                 {
-                    var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-\s]+)\s(.*)($|\n)");
-                    MatchCollection mc = r.Matches(line);
-                    if (mc.Count == 0)
+                    break;
+                }
+                else
+                {
+                    foreach (Match m in mc)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        foreach (Match m in mc)
+                        var subheadingWord = m.Groups[2].Value.Trim();
+                        if (subheadingWord == Word.Entry.Form)
                         {
-                            var subheadingWord = m.Groups[2].Value.Trim();
-                            if (subheadingWord == Word.Entry.Form)
+                            Word.Translations.Add(new Translation
                             {
-                                Word.Translations.Add(new Translation
+                                Title = m.Groups[1].Value.Replace("】【", "・"),
+                                Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
+                            });
+                        }
+                        else
+                        {
+                            var subheading = dictionary.Words.FirstOrDefault(word => word.Entry.Form == subheadingWord) ??
+                                new Word
                                 {
-                                    Title = m.Groups[1].Value.Replace("】【", "・"),
-                                    Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
-                                });
-                            }
-                            else
-                            {
-                                var subheading = dictionary.Words.FirstOrDefault(word => word.Entry.Form == subheadingWord) ??
-                                    new Word
+                                    Entry = new Entry
                                     {
-                                        Entry = new Entry
-                                        {
-                                            Form = subheadingWord,
-                                        },
-                                        Translations = new List<Translation>(),
-                                        Tags = new List<string>
-                                        {
+                                        Form = subheadingWord,
+                                    },
+                                    Translations = new List<Translation>(),
+                                    Tags = new List<string>
+                                    {
                                             "小見出し",
-                                        },
-                                        Relations = new List<Relation>(),
-                                    };
-                                subheading.Translations.Add(new Translation
-                                {
-                                    Title = m.Groups[1].Value.Replace("】【", "・"),
-                                    Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
-                                });
-                                subheading.Relations.Add(new Relation
-                                {
-                                    Title = "見出し語",
-                                    Entry = Word.Entry,
-                                });
-                                Word.Relations.Add(new Relation
-                                {
-                                    Title = "小見出し",
-                                    Entry = subheading.Entry,
-                                });
-                                list.Add(subheading);
-                            }
+                                    },
+                                    Relations = new List<Relation>(),
+                                };
+                            subheading.Translations.Add(new Translation
+                            {
+                                Title = m.Groups[1].Value.Replace("】【", "・"),
+                                Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
+                            });
+                            subheading.Relations.Add(new Relation
+                            {
+                                Title = "見出し語",
+                                Entry = Word.Entry,
+                            });
+                            Word.Relations.Add(new Relation
+                            {
+                                Title = "小見出し",
+                                Entry = subheading.Entry,
+                            });
+                            list.Add(subheading);
                         }
                     }
                 }
