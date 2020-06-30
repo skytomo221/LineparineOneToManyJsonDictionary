@@ -272,9 +272,9 @@ namespace LineparineOneToManyJsonDictionary
             if (Word.Translations.Any(t => t.Title == "名詞")
                 && !Regex.IsMatch(Word.Entry.Form, @"\s|[A-Z\.]")
                 && !string.IsNullOrEmpty(LastVowelLetter(Word.Entry.Form)))
-                return AddSingularForm(Word.Entry.Form, "単数形")
-                      .AddPluralForm(Word.Entry.Form, string.Empty)
-                      .AddFinite(Word.Entry.Form, string.Empty)
+                return AddSingularForm(Word.Entry.Form, string.Empty)
+                    //.AddPluralForm(Word.Entry.Form, string.Empty)
+                    //.AddFinite(Word.Entry.Form, string.Empty)
                       .Word;
             else
                 return Word;

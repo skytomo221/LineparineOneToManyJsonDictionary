@@ -83,17 +83,17 @@ namespace LineparineOneToManyJsonDictionary
             return this;
         }
 
-        protected WordConverter ConvertWording()
+        protected WordConverter ConvertContent(string title)
         {
-            var wording = new Content { Title = "語法", Text = string.Empty };
+            var content = new Content { Title = title, Text = string.Empty };
             var delete = new List<int>();
             var flag = false;
             foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
             {
-                if (line == "[語法]")
+                if (line == $"[{title}]")
                     flag = true;
                 else if (flag)
-                    wording.Text = (wording.Text + "\n" + line).Trim();
+                    content.Text = (content.Text + "\n" + line).Trim();
                 else if (string.IsNullOrEmpty(line))
                     flag = false;
                 if (flag)
@@ -107,16 +107,16 @@ namespace LineparineOneToManyJsonDictionary
                 .TakeWhile((line, index) => !delete.Contains(index))
                 .Select(taple => taple.line)
                 .Aggregate((now, next) => now + "\n" + next);
-            Word.Contents.Add(wording);
-            wording = new Content { Title = "語法", Text = string.Empty };
+            Word.Contents.Add(content);
+            content = new Content { Title = title, Text = string.Empty };
             delete.Clear();
             flag = false;
             foreach (var (line, index) in DicWord.Exp.Split('\n').Select((line, index) => (line, index)))
             {
-                if (line == "[語法]")
+                if (line == $"[{title}]")
                     flag = true;
                 else if (flag)
-                    wording.Text = (wording.Text + "\n" + line).Trim();
+                    content.Text = (content.Text + "\n" + line).Trim();
                 else if (string.IsNullOrEmpty(line))
                     flag = false;
                 if (flag)
@@ -130,58 +130,7 @@ namespace LineparineOneToManyJsonDictionary
                 .TakeWhile((line, index) => !delete.Contains(index))
                 .Select(taple => taple.line)
                 .Aggregate((now, next) => now + "\n" + next);
-            Word.Contents.Add(wording);
-            return this;
-        }
-
-        protected WordConverter ConvertCulture()
-        {
-            var culture = new Content { Title = "文化", Text = string.Empty };
-            var delete = new List<int>();
-            var flag = false;
-            foreach (var (line, index) in DicWord.Trans.Split('\n').Select((line, index) => (line, index)))
-            {
-                if (line == "[文化]")
-                    flag = true;
-                else if (flag)
-                    culture.Text = (culture.Text + "\n" + line).Trim();
-                else if (string.IsNullOrEmpty(line))
-                    flag = false;
-                if (flag)
-                    delete.Add(index);
-            }
-            DicWord.Trans =
-                (DicWord.Trans.Split('\n').Length == delete.Count) ?
-                string.Empty :
-                DicWord.Trans.Split('\n')
-                .Select((line, index) => (line, index))
-                .TakeWhile((line, index) => !delete.Contains(index))
-                .Select(taple => taple.line)
-                .Aggregate((now, next) => now + "\n" + next);
-            Word.Contents.Add(culture);
-            culture = new Content { Title = "文化", Text = string.Empty };
-            delete.Clear();
-            flag = false;
-            foreach (var (line, index) in DicWord.Exp.Split('\n').Select((line, index) => (line, index)))
-            {
-                if (line == "[文化]")
-                    flag = true;
-                else if (flag)
-                    culture.Text = (culture.Text + "\n" + line).Trim();
-                else if (string.IsNullOrEmpty(line))
-                    flag = false;
-                if (flag)
-                    delete.Add(index);
-            }
-            DicWord.Exp =
-                (DicWord.Exp.Split('\n').Length == delete.Count) ?
-                string.Empty :
-                DicWord.Exp.Split('\n')
-                .Select((line, index) => (line, index))
-                .TakeWhile((line, index) => !delete.Contains(index))
-                .Select(taple => taple.line)
-                .Aggregate((now, next) => now + "\n" + next);
-            Word.Contents.Add(culture);
+            Word.Contents.Add(content);
             return this;
         }
 
@@ -272,8 +221,8 @@ namespace LineparineOneToManyJsonDictionary
 
         public WordConverter Initialization()
         {
-            DicWord.Trans = DicWord.Trans.Replace("\r\n", "\n");
-            DicWord.Exp = DicWord.Exp.Replace("\r\n", "\n");
+            DicWord.Trans = DicWord.Trans.Replace("　", " ").Replace("\r\n", "\n");
+            DicWord.Exp = DicWord.Exp.Replace("　", " ").Replace("\r\n", "\n");
             return this;
         }
 
@@ -300,8 +249,9 @@ namespace LineparineOneToManyJsonDictionary
                 .ConvertEntry()
                 .ConvertTranslations()
                 .ConvertTags()
-                .ConvertWording()
-                .ConvertCulture()
+                .ConvertContent("語法")
+                .ConvertContent("文化")
+                .ConvertContent("文法")
                 .ConvertRemarks()
                 .ConvertRelations()
                 .FinalAdjustment()
@@ -313,60 +263,57 @@ namespace LineparineOneToManyJsonDictionary
             var list = new List<Word>();
             foreach (var content in Word.Contents)
             {
-                foreach (var (line, index) in content.Text.Split('\n').Select((line, index) => (line, index)))
+                var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-\s]+)\s(.*)($|\n)");
+                MatchCollection mc = r.Matches(content.Text);
+                if (mc.Count == 0)
                 {
-                    var r = new Regex(@"【(.*)】\s?([a-zA-Z\.\'\-\s]+)\s(.*)($|\n)");
-                    MatchCollection mc = r.Matches(line);
-                    if (mc.Count == 0)
+                    break;
+                }
+                else
+                {
+                    foreach (Match m in mc)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        foreach (Match m in mc)
+                        var subheadingWord = m.Groups[2].Value.Trim();
+                        if (subheadingWord == Word.Entry.Form)
                         {
-                            var subheadingWord = m.Groups[2].Value.Trim();
-                            if (subheadingWord == Word.Entry.Form)
+                            Word.Translations.Add(new Translation
                             {
-                                Word.Translations.Add(new Translation
+                                Title = m.Groups[1].Value.Replace("】【", "・"),
+                                Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
+                            });
+                        }
+                        else
+                        {
+                            var subheading = dictionary.Words.FirstOrDefault(word => word.Entry.Form == subheadingWord) ??
+                                new Word
                                 {
-                                    Title = m.Groups[1].Value.Replace("】【", "・"),
-                                    Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
-                                });
-                            }
-                            else
-                            {
-                                var subheading = dictionary.Words.FirstOrDefault(word => word.Entry.Form == subheadingWord) ??
-                                    new Word
+                                    Entry = new Entry
                                     {
-                                        Entry = new Entry
-                                        {
-                                            Form = subheadingWord,
-                                        },
-                                        Translations = new List<Translation>(),
-                                        Tags = new List<string>
-                                        {
+                                        Form = subheadingWord,
+                                    },
+                                    Translations = new List<Translation>(),
+                                    Tags = new List<string>
+                                    {
                                             "小見出し",
-                                        },
-                                        Relations = new List<Relation>(),
-                                    };
-                                subheading.Translations.Add(new Translation
-                                {
-                                    Title = m.Groups[1].Value.Replace("】【", "・"),
-                                    Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
-                                });
-                                subheading.Relations.Add(new Relation
-                                {
-                                    Title = "見出し語",
-                                    Entry = Word.Entry,
-                                });
-                                Word.Relations.Add(new Relation
-                                {
-                                    Title = "小見出し",
-                                    Entry = subheading.Entry,
-                                });
-                                list.Add(subheading);
-                            }
+                                    },
+                                    Relations = new List<Relation>(),
+                                };
+                            subheading.Translations.Add(new Translation
+                            {
+                                Title = m.Groups[1].Value.Replace("】【", "・"),
+                                Forms = Regex.Split(m.Groups[3].Value, @"、|\s").ToList(),
+                            });
+                            subheading.Relations.Add(new Relation
+                            {
+                                Title = "見出し語",
+                                Entry = Word.Entry,
+                            });
+                            Word.Relations.Add(new Relation
+                            {
+                                Title = "小見出し",
+                                Entry = subheading.Entry,
+                            });
+                            list.Add(subheading);
                         }
                     }
                 }
