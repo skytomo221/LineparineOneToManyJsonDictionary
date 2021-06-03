@@ -50,7 +50,7 @@ namespace LineparineOneToManyJsonDictionary
                         Word.Translations.Add(new Translation
                         {
                             Title = m.Groups[1].Value.Replace("】【", "・"),
-                            Forms = Regex.Split(m.Groups[2].Value, @"、|(?<!\w)\s").ToList(),
+                            Forms = Regex.Split(m.Groups[2].Value, @"、|(?<!\p{IsBasicLatin})\s").ToList(),
                         });
                     }
                     delete.Add(index);
